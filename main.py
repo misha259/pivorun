@@ -54,7 +54,7 @@ def create_lvl(level):
             x += P_WIDTH
         create_platform(x, y)
         y += P_HEIGHT
-    x += P_WIDTH * -1
+    x = P_WIDTH * -1
     for _ in range(18):
         create_platform(x, y)
         x += P_WIDTH
@@ -68,6 +68,7 @@ player = Player(0, win)
 while True:
     for i in pygame.event.get():
         if i.type == pygame.QUIT:
+            print(player.mspeed)
             exit()
     clock.tick(FPS)
     win.fill((255,255,255))

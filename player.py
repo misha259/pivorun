@@ -17,9 +17,11 @@ class Player(pygame.sprite.Sprite):
         self.ms = ms
         self.speed = SPEED
         self.jumpspeed = 0
-        self.jump = False
+        self.jump = True
         self.xv = 0
         self.yv = 0
+        self.mspeed = 0
+        self.p = ""
 
     def update(self):
         keys = pygame.key.get_pressed()
@@ -36,25 +38,28 @@ class Player(pygame.sprite.Sprite):
         if self.jump:
             self.rect.y += self.jumpspeed
             self.jumpspeed += G
-            if self.rect.y >= 550:
-                self.rect.y = 550
-                self.jump = False
+            self.mspeed = max(self.mspeed, abs(self.jumpspeed))
+
 
     def collide(self, platforms):
         for p in platforms:
             if pygame.sprite.collide_rect(self, p):
-                if self.jump:
-                    if self.jumpspeed < 0:
-                        self.jumpspeed = 0
-                        self.rect.top = p.rect.bottom
-                    if self.jumpspeed > 0:
-                        self.jump = False
-                        self.rect.bottom = p.rect.top
-                if self.rect.bottom > p.rect.top and self.rect.top < p.rect.bottom:
-                    if self.xv > 0:
-                        self.rect.right = p.rect.left
-                    if self.xv < 0:
-                        self.rect.left = p.rect.right
+                if self.rect.right > p.rect.left and self.rect.left < p.rect.right:
+                    if self.rect.bottom > p.rect.top and self.rect.top < p.rect.top:
+                        if self.jumpspeed > 0 and self.rect.bottom < p.rect.top + self.jumpspeed:
+                            self.jump = False
+                            self.rect.bottom = p.rect.top
+                            self.p = p
+                            return 0
+                    if self.rect.top < p.rect.bottom:
+                        if self.jumpspeed < 0:
+                            self.jumpspeed = 0
+                            self.rect.top = p.rect.bottom
+
+        if not self.jump and (self.rect.left > self.p.rect.right or self.rect.right < self.p.rect.left):
+            self.jumpspeed = 0
+            self.jump = True
+
 
 
 class Platform(pygame.sprite.Sprite):
@@ -65,3 +70,5 @@ class Platform(pygame.sprite.Sprite):
         self.rect = pygame.Rect(x, y, P_WIDTH, P_HEIGHT)
 
 
+#class Portal(pygame.sprite.Sprite):
+ #   def __init__(self):
